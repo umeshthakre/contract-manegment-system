@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const contractsApi = createApi({
     reducerPath: 'contractsApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000' }),
+    baseQuery: fetchBaseQuery({ baseUrl: 'http://34.230.45.237:4000' }),
     tagTypes: ["contracts"],
     endpoints: (builder) => ({
         getAllContracts: builder.query({

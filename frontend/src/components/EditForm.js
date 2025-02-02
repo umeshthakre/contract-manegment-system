@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useGetContractByIdQuery, useUpdateContractByIdMutation } from '../redux/services/contract';
 import { useFormik } from 'formik';
 
@@ -8,6 +8,8 @@ const EditForm = () => {
 
 
     const { id } = useParams();
+
+
 
     const navigate = useNavigate();
 
@@ -26,7 +28,7 @@ const EditForm = () => {
             await update(values).then((res) => {
                 console.log(res);
                 alert("Updated Client Contract with " + id)
-                navigate("/")
+                // navigate("/")
             })
                 .catch((err) => {
                     console.log(err)

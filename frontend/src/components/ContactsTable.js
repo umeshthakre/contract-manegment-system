@@ -12,12 +12,14 @@ import { useEffect, useState } from 'react';
 import UploadModal from './UploadModal';
 import EditForm from './EditForm';
 import { io } from 'socket.io-client';
+import { useLocation } from 'react-router-dom';
+
 
 export function ContractsTable() {
 
     const [searchQuery, setSearchQuery] = useState("");
     const [page, setPage] = useState(0)
-
+    const { pathname } = useLocation();
     const [searchType, setSearchType] = useState("name")
 
     const [searchId, setSearchId] = useState("")
@@ -27,7 +29,7 @@ export function ContractsTable() {
     const [showModal, setShowModal] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false)
 
-    let { data, isLoading, error, refetch } = useGetAllContractsQuery({ searchQuery, searchId, status, page })
+    let { data, isLoading, error, refetch, isFetching,isUninitialized } = useGetAllContractsQuery({ searchQuery, searchId, status, page })
 
     data = isLoading ? [] : data;
 
@@ -43,7 +45,7 @@ export function ContractsTable() {
 
 
     useEffect(() => {
-        const socket = io('ws://localhost:4000');
+        const socket = io('ws://34.230.45.237:4000');
 
         console.log('connection', socket.connected)
         socket.on("hi", (msg) => {
@@ -52,10 +54,15 @@ export function ContractsTable() {
 
         socket.on("update",(msg)=>{
             console.log('msg',msg)
-           if(!isLoading){
-            console.log('refetching')
-            refetch()
-           } 
+            console.log('loading',isLoading)
+            console.log('fetching',isFetching)
+            console.log("pathname",pathname)
+            console.log('url',window.location.href.split("/"))
+            console.log("condition",window.location.href.split("/") == "")
+            if(window.location.href.split("/")[3] == ""){
+                refetch()
+            }
+            
         })
 
     }, [])
