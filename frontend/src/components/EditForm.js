@@ -39,7 +39,9 @@ const EditForm = () => {
 
     return <>
         <div class="md:flex md:justify-center mb-6 mt-24">
+           
             <div class="w-full max-w-xs">
+            <label className='font-medium ml-28 mt-4 text-xl' >Edit Form</label>
                 <form onSubmit={formik.handleSubmit} class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="username">

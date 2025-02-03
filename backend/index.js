@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import { createClient } from '@supabase/supabase-js';
 const { PORT, SUPABASE_API_KEY, SUPABASE_PROJECT_ID } = process.env
 import ip from 'ip'
+
 import multer from 'multer'
 import cors from 'cors'
 
@@ -26,6 +27,8 @@ console.log(path.join(__dirname, '/dist', 'index.html'))
 
 
 const app = express();
+// using morgan for logs
+app.use(morgan('combined'));
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, { cors: {
@@ -43,8 +46,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions))
 
-// using morgan for logs
-app.use(morgan('combined'));
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

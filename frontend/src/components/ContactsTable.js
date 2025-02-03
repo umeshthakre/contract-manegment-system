@@ -1,5 +1,5 @@
 
-import { useGetAllContractsQuery } from '../redux/services/contract';
+import { contractsApi, useGetAllContractsQuery } from '../redux/services/contract';
 import {
 
     createColumnHelper,
@@ -13,6 +13,7 @@ import UploadModal from './UploadModal';
 import EditForm from './EditForm';
 import { io } from 'socket.io-client';
 import { useLocation } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 
 export function ContractsTable() {
@@ -29,7 +30,9 @@ export function ContractsTable() {
     const [showModal, setShowModal] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false)
 
-    let { data, isLoading, error, refetch, isFetching,isUninitialized } = useGetAllContractsQuery({ searchQuery, searchId, status, page })
+    const dispatch = useDispatch();
+
+    let { data, isLoading, error, refetch, isFetching, isUninitialized } = useGetAllContractsQuery({ searchQuery, searchId, status, page })
 
     data = isLoading ? [] : data;
 
@@ -52,27 +55,28 @@ export function ContractsTable() {
             console.log(msg)
         })
 
-        socket.on("update",(msg)=>{
-            console.log('msg',msg)
-            console.log('loading',isLoading)
-            console.log('fetching',isFetching)
-            console.log("pathname",pathname)
-            console.log('url',window.location.href.split("/"))
-            console.log("condition",window.location.href.split("/") == "")
-            if(window.location.href.split("/")[3] == ""){
-                refetch()
-            }
-            
+        socket.on("update", (msg) => {
+            console.log('msg', msg)
+            console.log('loading', isLoading)
+            console.log('fetching', isFetching)
+            console.log("pathname", pathname)
+            console.log('url', window.location.href.split("/"))
+            console.log("condition", window.location.href.split("/") == "")
+            // if (window.location.href.split("/")[3] == "") {
+                dispatch(contractsApi.util.invalidateTags(["contracts"]))
+            // }
+
         })
 
-    }, [])
+    }, [refetch])
 
 
 
     return (
         <div className='grid grid-row-12'>
-            <div className='row-start-1 row-end-3'>
+            <div className='row-start-1 row-end-3 flex justify-center mt-5 '>
                 <select
+                    className=' outline-none border-spacing-2 border-2 border-gray-400  mx-3 rounded-md'
                     onChange={(e) => {
                         if (e.target.value == "name") {
                             setSearchId("");
@@ -94,6 +98,7 @@ export function ContractsTable() {
                 </select>
 
                 <select
+                    className=' outline-none border-spacing-2 border-2 border-gray-400  mx-3 rounded-md'
                     onChange={(e) => {
                         setStatus(e.target.value)
                     }}
@@ -110,6 +115,7 @@ export function ContractsTable() {
                 </select>
 
                 <input
+                    className='shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username'
                     value={searchType == "name" ? searchQuery : searchId}
                     onChange={(e) => {
                         if (searchType != "id") {
@@ -122,23 +128,29 @@ export function ContractsTable() {
                     type='text'
                 />
                 <button
-                    className='border border-black rounded-md'
+                    className='border border-black rounded-md py-1 px-2 mx-1'
                 >Search</button>
 
                 <button
+                    className='border border-black rounded-md py-1 px-2 mx-1'
                     onClick={() => {
                         console.log(showModal)
-                        setShowModal(true);
+                        setShowModal(!showModal);
                     }}
                 >Upload File</button>
             </div>
-            <div className="p-2">
-                <table>
+            {
+                showModal && <UploadModal
+                setShowModal = {setShowModal}
+                />
+            }
+            <div className=' mt-8 flex justify-center align-middle'>
+                <table >
                     <thead>
                         {table.getHeaderGroups().map(headerGroup => (
-                            <tr key={headerGroup.id}>
+                            <tr className='border border-spacing-1 border-black' key={headerGroup.id}>
                                 {headerGroup.headers.map(header => (
-                                    <th key={header.id}>
+                                    <th className='border border-spacing-1 border-black' key={header.id}>
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
@@ -152,9 +164,9 @@ export function ContractsTable() {
                     </thead>
                     <tbody>
                         {table.getRowModel().rows.map(row => (
-                            <tr key={row.id}>
+                            <tr className='border border-spacing-1 border-black ' key={row.id}>
                                 {row.getVisibleCells().map(cell => (
-                                    <td key={cell.id}>
+                                    <td className='border border-spacing-1 border-black py-2 px-4' key={cell.id}>
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </td>
                                 ))}
@@ -177,31 +189,35 @@ export function ContractsTable() {
                             </tr>
                         ))}
                     </tfoot>
+                    
+
                 </table>
+                <span><button
+
+                    className='outline-none border-spacing-2 border-2 border-gray-400 px-2 py-2  mx-2 my-4 rounded-lg'
+
+                        onClick={(e) => {
+                            if (page != 0) {
+                                setPage(page - 1)
+                            }
+
+                        }}
+
+                    >Prev</button><button
+                    className='outline-none border-spacing-2 border-2 border-gray-400 px-2 py-2  mx-2 my-4 rounded-lg'
+                        onClick={(e) => {
+                            setPage(page + 1)
+                        }}
+                    >next</button></span>
+
                 <div className="h-4" />
                 {/* <button onClick={() => rerender()} className="border p-2">
         Rerender
       </button> */}
 
-                <div><button
-
-                    onClick={(e) => {
-                        if (page != 0) {
-                            setPage(page - 1)
-                        }
-
-                    }}
-
-                >Prev</button><button
-                    onClick={(e) => {
-                        setPage(page + 1)
-                    }}
-                >next</button></div>
 
             </div>
             {
-                showModal && <UploadModal />
-            }{
                 showEditForm && <EditForm />
             }
 
