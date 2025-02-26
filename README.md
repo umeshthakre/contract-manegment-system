@@ -1,4 +1,4 @@
-# Contract Manegment System
+# Contract Management System
 
 ## Getting Started
 
